@@ -5,13 +5,25 @@ import YandexMapsApi from './util/api';
 
 const { node, bool, shape, string, oneOf, object, func, oneOfType } = PropTypes;
 
+/**
+ * {@link https://tech.yandex.com/maps/doc/jsapi/2.1/versions/concepts/index-docpage/}
+ * @type {RegExp}
+ */
+const CORRECT_API_VERSION_RE = /^2\.1.*?/;
+
 export class YMaps extends React.Component {
   static propTypes = {
     children: oneOfType([node, func]),
     onApiAvaliable: func,
 
     enterprise: bool,
-    version: oneOf(['1.0', '1.1', '2.0', '2.1']),
+    version: (props, propName, componentName) => {
+      if (!CORRECT_API_VERSION_RE.test(props[propName])) {
+        return new Error(
+          `Invalid prop \`${propName}\` supplied to \`${componentName}\`, expected \`${CORRECT_API_VERSION_RE.toString()}\`.`
+        );
+      }
+    },
 
     query: shape({
       lang: string,
